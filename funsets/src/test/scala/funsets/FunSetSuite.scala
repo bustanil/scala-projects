@@ -1,5 +1,7 @@
 package funsets
 
+import funsets.Main.s
+
 /**
  * This class is a test suite for the methods in object FunSets.
  *
@@ -44,7 +46,7 @@ class FunSetSuite extends munit.FunSuite:
    * Once you finish your implementation of "singletonSet", remove the
    * .ignore annotation.
    */
-  test("singleton set one contains one".ignore) {
+  test("singleton set one contains one") {
 
     /**
      * We create a new instance of the "TestSets" trait, this gives us access
@@ -64,6 +66,12 @@ class FunSetSuite extends munit.FunSuite:
       assert(contains(s, 1), "Union 1")
       assert(contains(s, 2), "Union 2")
       assert(!contains(s, 3), "Union 3")
+  }
+
+  test("forall {1,2,3,4}") {
+    new TestSets:
+      val s = union(singletonSet(1), union(singletonSet(2), union(singletonSet(3), singletonSet(4))))
+      assert(forall(s, n => n < 5), "All elements in the set are strictly less than 5.")
   }
 
 
