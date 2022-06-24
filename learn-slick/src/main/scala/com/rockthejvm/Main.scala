@@ -20,7 +20,7 @@ object Main {
   val theMatrix = Movie(2, "The Matrix", LocalDate.of(1999, 3, 31), 134)
 
   def demoInsertMovie(): Unit = {
-    val queryDescription = SlickTables.movieTable += theMatrix
+    val queryDescription = SlickTables.movieTable += shawshankRedemption
     val futureId: Future[Int] = Connection.db.run(queryDescription)
 
     futureId.onComplete {
@@ -66,11 +66,11 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-//    demoInsertMovie()
+   demoInsertMovie()
 //    demoReadAllMovies()
 //    demoReadSomeMovies()
 //    demoUpdate()
-    demoDelete()
+    // demoDelete()
   }
 
 }
