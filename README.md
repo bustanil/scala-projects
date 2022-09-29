@@ -9,3 +9,5 @@ This repository is a collection of Scala projects that I wrote while learning Sc
 3. [Scala at Light Speed](https://github.com/bustanil/scala-projects/tree/master/scala-at-light-speed)
 4. [Learn Akka Typed](https://github.com/bustanil/scala-projects/tree/master/learn-akka)
 5. [Learn Slick](https://github.com/bustanil/scala-projects/tree/master/learn-slick)
+6. [Learn Cats](https://github.com/bustanil/scala-projects/tree/master/learn-cats)
+7. [Learn Scala.js](https://github.com/bustanil/scala-projects/tree/master/learn-scalajs)
