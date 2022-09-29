@@ -11,3 +11,5 @@ This repository is a collection of Scala projects that I wrote while learning Sc
 5. [Learn Slick](https://github.com/bustanil/scala-projects/tree/master/learn-slick)
 6. [Learn Cats](https://github.com/bustanil/scala-projects/tree/master/learn-cats)
 7. [Learn Scala.js](https://github.com/bustanil/scala-projects/tree/master/learn_scalajs)
+8. [Learn Mill](https://github.com/bustanil/scala-projects/tree/master/learn-mill)
+9. [Learn Doobie](https://github.com/bustanil/scala-projects/tree/master/learn-doobie)
