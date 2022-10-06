@@ -68,3 +68,11 @@ executeRequestME[ErrorOr, Throwable](HttpRequest(GET, "www.example.com"))(e => e
 
 type ErrorOr2[A] = Either[String, A]
 executeRequestME[ErrorOr2, String](HttpRequest(GET, "www.example.com"))((e: Exception) => e.toString)
+
+// additional functions
+MonadError[Option, Unit].attempt(Some(5))
+MonadError[Option, Unit].attempt(None)
+MonadError[Try, Throwable].attempt(Success(5))
+MonadError[Try, Throwable].attempt(Failure(new Exception("boom")))
+
+MonadError[Option, Unit].ensure(Some(2))(())(_ % 2 == 0)
