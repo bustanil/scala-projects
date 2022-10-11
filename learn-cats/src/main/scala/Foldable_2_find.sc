@@ -69,3 +69,24 @@ def find2[F[_]: Foldable, A](fa: F[A])(p: A => Boolean): Option[A] = {
 
 find(MList(1, 2, 3))(a => a % 2 == 0)
 find2(MList(1, 2, 3))(a => a % 2 == 0)
+
+def exists[F[_]: Foldable, A](fa: F[A])(p:A => Boolean): Boolean = {
+  fa.foldLeft[Boolean](false)((b, a) => b || p(a))
+}
+
+exists(MList(1, 2, 3))(a => a == 4)
+exists(MList(1, 2, 3))(a => a == 2)
+
+def toList[F[_]: Foldable, A](fa: F[A]): MList[A] = {
+  fa.foldRight(Eval.now(mnil[A]))((a, b) => b.flatMap(b => Eval.later(MCons(a, b)))).value
+}
+
+toList(Option(1))
+toList(MList(1, 2, 3))
+
+def forall[F[_]: Foldable, A](fa: F[A])(p: A => Boolean): Boolean = {
+  fa.foldLeft[Boolean](true)((b, a) => b && p(a))
+}
+
+forall(MList(1, 3, 5))(a => a % 2 != 0)
+forall(MList(2, 3, 5))(a => a % 2 != 0)
