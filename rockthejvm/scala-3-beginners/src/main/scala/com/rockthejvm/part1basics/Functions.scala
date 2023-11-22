@@ -82,9 +82,9 @@ object Functions {
     println(greeting("Bustanil", 40))
     println(factorial(1))
 
-    println(fibonacci(2))
+    println(fibonacci(4))
 
-    println(isPrime(4))
+    println(isPrime(4000000))
   }
   
 }
