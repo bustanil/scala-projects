@@ -1,5 +1,7 @@
 package com.rockthejvm.part2oop
 
+import com.rockthejvm.part1basics.StringOps.name
+
 object OOBasics {
 
   // classes
@@ -33,7 +35,41 @@ object OOBasics {
   def main(args: Array[String]): Unit = {
     println(hello)
     println(aPerson.greet())
+
+    val charlesDickens = new Writer("Charles", "Dickens", 1812)
+    val novel = new Novel("Great Expectations", 1816, charlesDickens)
+    println(charlesDickens.fullName())
+    println(novel.isWrittenBy(charlesDickens))
+    val newRelease = novel.copy(2013)
+
+    val c: Counter = new Counter(10)
+    val updated = c.inc().dec(3).print()
   }
 
 }
 
+/**
+  * Exercise
+  */
+
+ class Writer(firstName: String, lastName: String, val year: Int) {
+   def fullName(): String =
+     s"$firstName $lastName"
+ }
+
+ class Novel(name: String, yearOfRelease: Int, author: Writer) {
+   def authorAge(): Int = yearOfRelease - author.year
+
+   def isWrittenBy(author: Writer): Boolean = this.author == author
+
+   def copy(newYearOfRelease: Int): Novel =
+     new Novel(this.name, newYearOfRelease, this.author)
+ }
+
+ class Counter(val value: Int = 0) {
+   def inc(): Counter = inc(1)
+   def dec(): Counter = dec(1)
+   def inc(n: Int): Counter = new Counter(value + n)
+   def dec(n: Int): Counter = new Counter(value - n)
+   def print(): Unit = println(value)
+ }
