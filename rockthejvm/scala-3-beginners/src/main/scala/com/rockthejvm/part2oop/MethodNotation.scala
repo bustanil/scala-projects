@@ -36,7 +36,15 @@ object MethodNotation {
     val mary = new Person("Mary", 34, "Inception")
     val john = new Person("John", 36, "Fight Club")
 
+    class Point(val x: Int, val y: Int) {
+        infix def translate(p: Point): Point = 
+            new Point(x + p.x, y + p.y)
+
+        def show(): String = s"($x, $y)"
+    }
+
     /**
+     *
      * 
      */
 
@@ -65,6 +73,13 @@ object MethodNotation {
         println(maryOlder.age)
 
         println(mary(3))
+
+        val p1 = new Point(5, 10)
+        val p2 = new Point(1, 5)
+
+        val p3 = p1 translate p2
+
+        println(p3.show())
     }
     
 }
