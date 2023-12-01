@@ -40,6 +40,8 @@ object MethodNotation {
         infix def translate(p: Point): Point = 
             new Point(x + p.x, y + p.y)
 
+        infix def +(p: Point) = this.translate(p)
+
         def show(): String = s"($x, $y)"
     }
 
@@ -78,8 +80,10 @@ object MethodNotation {
         val p2 = new Point(1, 5)
 
         val p3 = p1 translate p2
+        val p4 = p1 + p2
 
         println(p3.show())
+        println(p4.show())
     }
     
 }
