@@ -4,7 +4,8 @@ import scala.io.Source
 
 object Cube {
 
-  type Game = List[Map[String , Int]] 
+  type Cubes = Map[String , Int]
+  type Game = List[Cubes] 
 
   def main(args: Array[String]): Unit = {
     val config = Map(("red" -> 12), ("green" -> 13), ("blue" -> 14))
@@ -38,7 +39,7 @@ object Cube {
           .toMap
       )
 
-  def isPossible(game: Game, config: Map[String, Int]): Boolean =
+  def isPossible(game: Game, config: Cubes): Boolean =
     game.forall(cubes =>
       cubes.forall((color, count) => 
         config.get(color) match
