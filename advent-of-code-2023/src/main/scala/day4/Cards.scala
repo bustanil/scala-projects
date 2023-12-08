@@ -5,10 +5,9 @@ import scala.io.Source
 object Cards {
     
     def main(args: Array[String]): Unit =
-        val regex = "^Card\\s+\\d+:([\\s\\d+]+)\\|([\\s\\d+]+)$".r
-        val test = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 5 3"
+        val content = Source.fromFile(args(0))
 
-        val content = Source.fromFile("/Users/bustanil.arifin/workspace/personal/scala-projects/advent-of-code-2023/src/main/scala/day4/input.txt")
+        val regex = "^Card\\s+\\d+:([\\s\\d+]+)\\|([\\s\\d+]+)$".r
 
         val points = for {
             line <- content.getLines()
