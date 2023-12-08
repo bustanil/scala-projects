@@ -8,7 +8,7 @@ object GearRatio {
   type NumberMap = Map[Int, List[(Int, Int, Int)]] // y => List of value, x1, x2
 
   def main(args: Array[String]): Unit = {
-    val content = Source.fromFile(args(0)).mkString
+    val content = Source.fromFile("/Users/bustanil.arifin/workspace/personal/scala-projects/advent-of-code-2023/src/main/scala/day3/input.txt").mkString
 
     val numberPattern = "\\d+".r
     val symbolPattern = "([^\\d\\.\\s])".r // not digit or dot or whitespace
