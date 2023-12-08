@@ -81,10 +81,10 @@ object GearRatio {
   def adjacentNumbers(r: Int, c: Int)(numberMap: NumberMap): List[(Int, Int, Int)] =
     numberMap
       .filter { (row, _) => row >= r - 1 && row <= r + 1 }
-      .map { (_, col) => col } // get the xs and value
-      .flatMap(_.filter { // filter numbers who are adjacent to c
-        case (_, s, e) if (c >= s - 1 && c <= e + 1) => true
-        case _                                       => false
+      .map { (_, col) => col }
+      .flatMap(_.filter { 
+        case (_, start, finish) if (c >= start - 1 && c <= finish + 1) => true
+        case _                                                         => false
       })
       .toList
 
