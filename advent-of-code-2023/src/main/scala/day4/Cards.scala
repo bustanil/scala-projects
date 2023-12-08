@@ -10,15 +10,13 @@ object Cards {
 
         val content = Source.fromFile("/Users/bustanil.arifin/workspace/personal/scala-projects/advent-of-code-2023/src/main/scala/day4/input.txt")
 
-        val part1 = content.getLines()
-        .tapEach(println)
-        .map(line => regex.findAllMatchIn(line).next())        
-        .map(m => m.group(1).trim().split("\\s+").intersect(m.group(2).trim().split("\\s+")).length match {
+        val points = for {
+            line <- content.getLines()
+            m <- regex.findAllMatchIn(line)
+        } yield m.group(1).trim().split("\\s+").intersect(m.group(2).trim().split("\\s+")).length match {
             case 0 => 0
             case length => Math.pow(2, length - 1).toInt
-        })
-        .sum
+        }
 
-        println(part1)
-
+        println(points.sum)
 }
