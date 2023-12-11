@@ -8,7 +8,7 @@ object Cards {
     val regex: Regex = "^Card\\s+\\d+:([\\s\\d+]+)\\|([\\s\\d+]+)$".r
 
     def main(args: Array[String]): Unit = {
-        val content = Source.fromFile("/Users/bustanil.arifin/workspace/personal/scala-projects/advent-of-code-2023/src/main/scala/day4/input.txt")
+        val content = Source.fromFile(args(0))
         val lines = content.getLines().toList
 
         val points = for {
