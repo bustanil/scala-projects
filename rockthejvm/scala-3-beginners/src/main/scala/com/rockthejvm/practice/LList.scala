@@ -1,7 +1,5 @@
 package com.rockthejvm.practice
 
-import scala.annotation.{tailrec, targetName}
-
 abstract class LList[T] {
 
   def head: T
@@ -16,19 +14,19 @@ abstract class LList[T] {
 
 }
 
-class Empty[T] extends LList[T] {
+case class Empty[T]() extends LList[T] {
   override def head: T = throw new NoSuchElementException
   override def tail: LList[T] = throw new NoSuchElementException
   override def isEmpty: Boolean = true
   override def toString: String = "|"
-  override def map[B](transformer: Transformer[T, B]): LList[B] = Empty[B]()
-  override def filter(p: Predicate[T]): LList[T] = Empty[T]()
-  override def flatMap[B](t: Transformer[T, LList[B]]): LList[B] = Empty[B]()
+  override def map[B](transformer: Transformer[T, B]): LList[B] = Empty()
+  override def filter(p: Predicate[T]): LList[T] = this
+  override def flatMap[B](t: Transformer[T, LList[B]]): LList[B] = Empty()
   override infix def ++(that: LList[T]): LList[T] = that
 }
 
 // override val -> define accessors which is also a constructor argument (WOW!)
-class Cons[T](override val head: T, override val tail: LList[T]) extends LList[T] {
+case class Cons[T](head: T, tail: LList[T]) extends LList[T] {
   override def isEmpty: Boolean = false
   override def toString: String = s"$head ${tail.toString}"
   def map[B](t: Transformer[T, B]): LList[B] = Cons(t.transform(head), tail.map(t))
