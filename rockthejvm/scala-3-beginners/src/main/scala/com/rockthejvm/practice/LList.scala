@@ -72,5 +72,17 @@ object LList {
     println(testFilter)
 
     println(test ++ test2)
+
+    def find[A](list: LList[A], predicate: Predicate[A]): A = {
+      if (list.isEmpty) throw new NoSuchElementException
+      else if (predicate.test(list.head)) list.head
+      else find(list.tail, predicate)
+    }
+
+    val f = find(test, new Predicate[Int](){
+      override def test(value: Int): Boolean = value == 1
+    })
+
+    println(f)
   }
 }
