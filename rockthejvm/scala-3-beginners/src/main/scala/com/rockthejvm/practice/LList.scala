@@ -10,6 +10,7 @@ abstract class LList[T] {
   def add(element: T): LList[T] = Cons(element, this)
   def map[B](t: T => B): LList[B]
   def filter(p: T => Boolean): LList[T]
+  def withFilter(p: T => Boolean): LList[T] = filter(p)
   def flatMap[B](t: T => LList[B]): LList[B]
   def foreach(f: T => Unit): Unit
   def zipWith[U](that: LList[T], f: (T, T) => U): LList[U]
