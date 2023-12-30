@@ -21,7 +21,7 @@ class AdvancedPatternMatching {
       else Some((person.name, person.age))
 
     def unapply(age: Int): Option[String] =
-      if (person.age < 21) Some("minor")
+      if (age < 21) Some("minor")
       else Some("legally allowed to drink")
   }
 
@@ -99,11 +99,12 @@ class AdvancedPatternMatching {
     def isEmpty: Boolean
     def get: T
   }
+  
 
   object PersonWrapper {
-    def unapply(person: Person): Wrapper[String] = new Wrapper[] {
+    def unapply(person: Person): Wrapper[String] = new Wrapper[String] {
       override def isEmpty: Boolean = false
-      override def get: T = person.name
+      override def get: String = person.name
     }
   }
 
