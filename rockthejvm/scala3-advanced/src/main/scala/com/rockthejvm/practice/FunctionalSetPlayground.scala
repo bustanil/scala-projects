@@ -13,6 +13,11 @@ abstract class FSet[A] extends (A => Boolean) {
   def flatMap[B](f: A => FSet[B]): FSet[B]
   def filter(p: A => Boolean): FSet[A]
   def foreach(f: A => Unit): Unit
+
+  infix def -(elem: A): FSet[A]
+  infix def --(anotherSet: FSet[A]): FSet[A]
+  infix def &(anotherSet: FSet[A]): FSet[A]
+  def unary_! : FSet[A] = new PBSet[A](!contains(_))
 }
 
 object FSet {
@@ -23,6 +28,30 @@ object FSet {
 
     buildSet(values, Empty())
   }
+}
+
+case class PBSet[A](property: A => Boolean) extends FSet[A] {
+
+  override def contains(elem: A): Boolean = property(elem)
+
+  override infix def +(elem: A): FSet[A] = new PBSet[A](x => x == elem || property(x))
+
+  override infix def ++(anotherSet: FSet[A]): FSet[A] =
+    new PBSet[A](x => property(x) || anotherSet(x))
+
+  override def map[B](f: A => B): FSet[B] = throw new RuntimeException("cannot iterate")
+
+  override def flatMap[B](f: A => FSet[B]): FSet[B] = throw new RuntimeException("cannot iterate")
+
+  override def filter(p: A => Boolean): FSet[A] = new PBSet[A](x => property(x) && p(x))
+
+  override def foreach(f: A => Unit): Unit = throw new RuntimeException("cannot iterate")
+
+  override infix def -(elem: A): FSet[A] = filter(_ != elem)
+
+  override infix def --(anotherSet: FSet[A]): FSet[A] = filter(!anotherSet)
+
+  override infix def &(anotherSet: FSet[A]): FSet[A] = filter(anotherSet)
 }
 
 case class Empty[A]() extends FSet[A] {
@@ -40,34 +69,46 @@ case class Empty[A]() extends FSet[A] {
   override def filter(p: A => Boolean): FSet[A] = Empty()
 
   override def foreach(f: A => Unit): Unit = ()
+
+  override infix def -(elem: A): FSet[A] = Empty()
+
+  override infix def --(anotherSet: FSet[A]): FSet[A] = anotherSet
+
+  override infix def &(anotherSet: FSet[A]): FSet[A] = Empty()
 }
 
-case class Cons[A](a: A, tail: FSet[A]) extends FSet[A] {
+case class Cons[A](head: A, tail: FSet[A]) extends FSet[A] {
 
   override def contains(elem: A): Boolean =
-    a == elem || tail.contains(elem)
+    head == elem || tail.contains(elem)
 
   override infix def +(elem: A): FSet[A] =
     if (contains(elem)) this
     else Cons(elem, this)
 
   override infix def ++(anotherSet: FSet[A]): FSet[A] =
-    if (anotherSet.contains(a)) tail ++ anotherSet
-    else Cons(a, tail ++ anotherSet)
+    if (anotherSet.contains(head)) tail ++ anotherSet
+    else Cons(head, tail ++ anotherSet)
 
   override def map[B](f: A => B): FSet[B] =
-    Cons(f(a), tail.map(f))
+    Cons(f(head), tail.map(f))
 
   override def flatMap[B](f: A => FSet[B]): FSet[B] =
-    f(a) ++ tail.flatMap(f)
+    f(head) ++ tail.flatMap(f)
 
   override def filter(p: A => Boolean): FSet[A] =
-    if (p(a)) Cons(a, filter(tail))
+    if (p(head)) Cons(head, filter(tail))
     else filter(tail)
 
   override def foreach(f: A => Unit): Unit =
-    f(a)
+    f(head)
     tail.foreach(f)
+
+  override infix def -(elem: A): FSet[A] = filter(_ != head)
+
+  override infix def --(anotherSet: FSet[A]): FSet[A] = filter(!anotherSet(_))
+
+  override infix def &(anotherSet: FSet[A]): FSet[A] = filter(anotherSet)
 }
 
 object FunctionalSetPlayground {
