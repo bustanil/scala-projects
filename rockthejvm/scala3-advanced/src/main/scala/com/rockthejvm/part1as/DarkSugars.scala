@@ -70,7 +70,7 @@ object DarkSugars {
   @targetName("Arrow")
   infix class -->[A, B]
   val compositeType: -->[Int, String] = new -->[Int, String]()
-  val compositeType_v2: Int --> String = new-->[Int, String]()
+  val compositeType_v2: Int --> String = new -->[Int, String]()
 
   // 6 - update
   val anArray: Array[Int] = Array(1, 2, 3, 4)
