@@ -7,8 +7,7 @@ abstract class LzList[A] {
 
   // utilities
   def #::(element: A): LzList[A] // prepending
-  def ++(another: LzList[A]): LzList[A] // TODO warning
-
+  def ++(another: => LzList[A]): LzList[A]
   // classics
   def foreach(f: A => Unit): Unit
   def map[B](f: A => B): LzList[B]
@@ -31,7 +30,7 @@ case class LzEmpty[A]() extends LzList[A] {
 
   override def #::(element: A): LzList[A] = LzCons[A](element, this)
 
-  override def ++(another: LzList[A]): LzList[A] = another
+  override def ++(another: => LzList[A]): LzList[A] = another
 
   override def foreach(f: A => Unit): Unit = ()
 
@@ -59,7 +58,7 @@ class LzCons[A](hd: => A, tl: => LzList[A]) extends LzList[A] {
 
   override def #::(element: A): LzList[A] = LzCons(element, this)
 
-  override def ++(another: LzList[A]): LzList[A] = LzCons[A](head, tail ++ another)
+  override def ++(another: => LzList[A]): LzList[A] = LzCons[A](head, tail ++ another)
 
   override def foreach(f: A => Unit): Unit =
     f(head)
@@ -69,7 +68,7 @@ class LzCons[A](hd: => A, tl: => LzList[A]) extends LzList[A] {
 
   override def flatMap[B](f: A => LzList[B]): LzList[B] = f(head) ++ tail.flatMap(f)
   override def take(n: Int): LzList[A] = {
-    if (n < 0) LzEmpty[A]()
+    if (n == 0) LzEmpty[A]()
     else LzCons[A](head, tail.take(n - 1))
   }
 
@@ -86,18 +85,49 @@ class LzCons[A](hd: => A, tl: => LzList[A]) extends LzList[A] {
 }
 
 object LzList {
+  def empty[A]: LzList[A] = LzEmpty()
   def generate[A](start: A)(generator: A => A): LzList[A] =
     LzCons[A](start, LzList.generate(generator(start))(generator))
 
   def from[A](list: List[A]): LzList[A] =
     if (list.isEmpty) LzEmpty[A]()
     else LzCons[A](list.head, LzList.from(list.tail))
+
+  def apply[A](values: A*): LzList[A] = {
+    LzList.from(values.toList)
+  }
+
+  def infiniteFibo: LzList[BigInt] = {
+    def fibo(first: BigInt, second: BigInt): LzList[BigInt] =
+      new LzCons[BigInt](first, fibo(second, first + second))
+
+    fibo(1, 2)
+  }
+
 }
 
 object LzListPlayground {
 
   def main(args: Array[String]): Unit = {
-    LzList.generate(1)(n => n + 1)
+    val naturals = LzList.generate(1)(n => n + 1)
+    println(naturals.head)
+    println(naturals.tail.head)
+    println(naturals.tail.tail.head)
+
+    val first100 = naturals.take(100)
+    first100.foreach(println)
+
+    val combinationsList = for {
+      number <- LzList(1, 2, 3)
+      string <- LzList("black", "white")
+    } yield s"$number-$string"
+
+    combinationsList.foreach(println)
+
+    // fibonacci
+    val fibos = LzList.infiniteFibo
+    println(fibos.take(5).toList)
+    
   }
 
 }
