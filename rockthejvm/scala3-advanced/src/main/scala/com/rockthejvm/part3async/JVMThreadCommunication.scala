@@ -1,4 +1,4 @@
-package com.rockthejvm.part2afp
+package com.rockthejvm.part3async
 
 import scala.collection.mutable
 import scala.util.Random
