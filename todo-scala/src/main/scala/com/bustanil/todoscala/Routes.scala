@@ -22,7 +22,7 @@ object Routes:
           _ <- T.add(todo)
           resp <- Ok()
         } yield resp
-      case req@PUT -> Root / "todo" / IntVar(itemId) / "completed" =>
+      case req@POST -> Root / "todo" / IntVar(itemId) / "complete" =>
         for {
           _ <- T.complete(itemId)
           resp <- Ok()
