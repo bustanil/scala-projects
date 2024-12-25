@@ -53,7 +53,7 @@ class TodoSpec extends CatsEffectSuite:
       todo <- InMemoryTodo.make[IO]
       _ <- todo.add(TodoItem(uuid"00000000-0000-0000-0000-000000000001", "Learn Scala 3", false))
       _ <- todo.add(TodoItem(uuid"00000000-0000-0000-0000-000000000002", "Learn Scala 3", false))
-      completeTodo = Request[IO](Method.POST, uri"/todo/00000000-0000-0000-0000-000000000001/complete")
+      completeTodo = Request[IO](Method.PATCH, uri"/todo/00000000-0000-0000-0000-000000000001").withEntity(CompleteTodoRequest(completed = true))
       response <- Routes.todoRoute(todo)(generator).orNotFound(completeTodo)
       todos <- todo.list
       status = response.status
@@ -86,7 +86,7 @@ class TodoSpec extends CatsEffectSuite:
   test("add a todo") {
     val statusAndTodos = for {
       todo <- InMemoryTodo.make[IO]
-      addTodo = Request[IO](Method.POST, uri"/todo").withEntity(TodoItem(uuid"00000000-0000-0000-0000-000000000001", "Learn Scala 3", false))
+      addTodo = Request[IO](Method.POST, uri"/todo").withEntity(CreateTodoRequest(TodoItem(uuid"00000000-0000-0000-0000-000000000001", "Learn Scala 3", false)))
       response <- Routes.todoRoute(todo)(generator).orNotFound(addTodo)
       todos <- todo.list
       status = response.status

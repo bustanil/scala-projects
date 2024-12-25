@@ -16,21 +16,22 @@ object Routes:
       case GET -> Root / "todo" =>
         for {
           todos <- T.list
-          resp <- Ok(TodoResponse(todos))
+          resp <- Ok(GetTodoResponse(todos))
         } yield resp
       case req@POST -> Root / "todo" =>
         for {
-          todo <- req.as[TodoItem]
+          req <- req.as[CreateTodoRequest]
           uuid <-  generator.uuid
-          _ <- T.add(todo.copy(id = uuid))
+          _ <- T.add(req.todo.copy(id = uuid))
           resp <- Ok()
         } yield resp
-      case req@POST -> Root / "todo" / UUIDVar(itemId) / "complete" =>
+      case req@PATCH -> Root / "todo" / UUIDVar(itemId) =>
         for {
-          _ <- T.complete(itemId)
+          req <- req.as[CompleteTodoRequest]
+          _ <- T.complete(itemId, req.completed)
           resp <- Ok()
         } yield resp
-      case req@DELETE -> Root / "todo" / UUIDVar(itemId) =>
+      case DELETE -> Root / "todo" / UUIDVar(itemId) =>
         for {
           _ <- T.delete(itemId)
           resp <- Ok()

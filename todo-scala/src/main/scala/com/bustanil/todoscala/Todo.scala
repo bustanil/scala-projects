@@ -19,7 +19,7 @@ trait Todo[F[_]]:
 
   def list: F[List[TodoItem]]
 
-  def complete(id: UUID): F[Unit]
+  def complete(id: UUID, completed: Boolean): F[Unit]
 
   def delete(id: UUID): F[Unit]
 
@@ -34,17 +34,38 @@ object TodoItem:
 
   given [F[_] : Concurrent]: EntityDecoder[F, TodoItem] = jsonOf
 
+case class CreateTodoRequest(todo: TodoItem)
 
-case class TodoResponse(todos: List[TodoItem])
+object CreateTodoRequest:
+  given Encoder[CreateTodoRequest] = Encoder.AsObject.derived[CreateTodoRequest]
 
-object TodoResponse:
-  given Encoder[TodoResponse] = Encoder.AsObject.derived[TodoResponse]
+  given Decoder[CreateTodoRequest] = Decoder.derived[CreateTodoRequest]
 
-  given Decoder[TodoResponse] = Decoder.derived[TodoResponse]
+  given [F[_] : Concurrent]: EntityDecoder[F, CreateTodoRequest] = jsonOf
 
-  given [F[_] : Concurrent]: EntityDecoder[F, TodoResponse] = jsonOf
+  given [F[_] : Concurrent]: EntityEncoder[F, CreateTodoRequest] = jsonEncoderOf
 
-  given [F[_] : Concurrent]: EntityEncoder[F, TodoResponse] = jsonEncoderOf
+case class CompleteTodoRequest(completed: Boolean)
+
+object CompleteTodoRequest:
+  given Encoder[CompleteTodoRequest] = Encoder.AsObject.derived[CompleteTodoRequest]
+
+  given Decoder[CompleteTodoRequest] = Decoder.derived[CompleteTodoRequest]
+
+  given [F[_] : Concurrent]: EntityDecoder[F, CompleteTodoRequest] = jsonOf
+
+  given [F[_] : Concurrent]: EntityEncoder[F, CompleteTodoRequest] = jsonEncoderOf
+
+case class GetTodoResponse(todos: List[TodoItem])
+
+object GetTodoResponse:
+  given Encoder[GetTodoResponse] = Encoder.AsObject.derived[GetTodoResponse]
+
+  given Decoder[GetTodoResponse] = Decoder.derived[GetTodoResponse]
+
+  given [F[_] : Concurrent]: EntityDecoder[F, GetTodoResponse] = jsonOf
+
+  given [F[_] : Concurrent]: EntityEncoder[F, GetTodoResponse] = jsonEncoderOf
 
 class InMemoryTodo[F[_]] private(ref: Ref[F, List[TodoItem]]) extends Todo[F]:
   def add(item: TodoItem): F[Unit] = ref.update(_ :+ item)
@@ -56,10 +77,10 @@ class InMemoryTodo[F[_]] private(ref: Ref[F, List[TodoItem]]) extends Todo[F]:
 
   def list: F[List[TodoItem]] = ref.get
 
-  def complete(id: UUID): F[Unit] =
+  def complete(id: UUID, completed: Boolean): F[Unit] =
     ref.update(todos =>
       todos.map(i =>
-        if (i.id === id) i.copy(completed = true) else i))
+        if (i.id === id) i.copy(completed = completed) else i))
 
   def delete(id: UUID): F[Unit] = ref.update(_.filterNot(_.id === id))
 
