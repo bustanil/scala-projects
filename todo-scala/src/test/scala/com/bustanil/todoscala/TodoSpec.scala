@@ -71,3 +71,17 @@ class TodoSpec extends CatsEffectSuite:
       assertEquals(todos, List(TodoItem(2, "Learn Scala 3", false)))
     })
   }
+
+  test("add a todo") {
+    val statusAndTodos = for {
+      todo <- InMemoryTodo.make[IO]
+      addTodo = Request[IO](Method.POST, uri"/todo").withEntity(TodoItem(1, "Learn Scala 3", false))
+      response <- Routes.todoRoute(todo).orNotFound(addTodo)
+      todos <- todo.list
+      status = response.status
+    } yield (status, todos)
+    statusAndTodos.flatMap((status, todos) => IO {
+      assertEquals(status, Status.Ok)
+      assertEquals(todos, List(TodoItem(1, "Learn Scala 3", false)))
+    })
+  }
