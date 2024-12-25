@@ -3,11 +3,13 @@ package com.bustanil.todoscala
 import cats.syntax.all.*
 import cats.effect.Ref
 import cats.effect.Sync
-import io.circe.{Encoder, Decoder}
+import io.circe.{Decoder, Encoder}
 import org.http4s.EntityDecoder
 import cats.effect.Concurrent
 import org.http4s.*
 import org.http4s.circe.*
+
+import java.util.UUID
 
 
 trait Todo[F[_]]:
@@ -17,11 +19,11 @@ trait Todo[F[_]]:
 
   def list: F[List[TodoItem]]
 
-  def complete(id: Int): F[Unit]
+  def complete(id: UUID): F[Unit]
 
-  def delete(id: Int): F[Unit]
+  def delete(id: UUID): F[Unit]
 
-case class TodoItem(id: Int, description: String, completed: Boolean)
+case class TodoItem(id: UUID, description: String, completed: Boolean)
 
 object TodoItem:
   given Encoder[TodoItem] = Encoder.AsObject.derived[TodoItem]
@@ -54,12 +56,12 @@ class InMemoryTodo[F[_]] private(ref: Ref[F, List[TodoItem]]) extends Todo[F]:
 
   def list: F[List[TodoItem]] = ref.get
 
-  def complete(id: Int): F[Unit] =
+  def complete(id: UUID): F[Unit] =
     ref.update(todos =>
       todos.map(i =>
-        if (i.id == id) i.copy(completed = true) else i))
+        if (i.id === id) i.copy(completed = true) else i))
 
-  def delete(id: Int): F[Unit] = ref.update(_.filterNot(_.id == id))
+  def delete(id: UUID): F[Unit] = ref.update(_.filterNot(_.id === id))
 
 object InMemoryTodo:
   def make[F[_] : Sync]: F[Todo[F]] =
