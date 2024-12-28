@@ -4,12 +4,11 @@ import cats.effect.{Async, Concurrent}
 import cats.syntax.all.*
 import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
-import tech.ant8e.uuid4cats.UUIDGenerator
 
 
 object Routes:
 
-  def todoRoute[F[_] : Concurrent : Async](T: Todo[F])(generator: UUIDGenerator[F]): HttpRoutes[F] =
+  def todoRoute[F[_] : Concurrent : Async : GenUUID](T: Todo[F]): HttpRoutes[F] =
     val dsl = new Http4sDsl[F] {}
     import dsl.*
     HttpRoutes.of[F] {
@@ -21,7 +20,7 @@ object Routes:
       case req@POST -> Root / "todo" =>
         for {
           req <- req.as[CreateTodoRequest]
-          uuid <-  generator.uuid
+          uuid <- GenUUID[F].uuid
           _ <- T.add(req.todo.copy(id = uuid))
           resp <- Ok()
         } yield resp

@@ -1,10 +1,11 @@
 package com.bustanil.todoscala
 
 import cats.effect.IO
+import cats.effect.kernel.Sync
 import org.http4s.*
 import org.http4s.implicits.*
 import munit.CatsEffectSuite
-import tech.ant8e.uuid4cats.UUIDGenerator
+
 import java.util.UUID
 
 class TodoSpec extends CatsEffectSuite:
@@ -12,15 +13,15 @@ class TodoSpec extends CatsEffectSuite:
   extension (sc: StringContext)
     def uuid(args: Any*): UUID = UUID.fromString(sc.s(args: _*))
 
-  given generator: UUIDGenerator[IO] =  new UUIDGenerator[IO] {
-    def uuid: IO[UUID] = IO(uuid"00000000-0000-0000-0000-000000000001")
+  given [F[_] : Sync]: GenUUID[F] = new GenUUID[F] {
+    def uuid: F[UUID] = Sync[F].delay(uuid"00000000-0000-0000-0000-000000000001")
   }
 
   test("get todo returns 200") {
     val statusIO = for {
       todo <- InMemoryTodo.make[IO]
       getTodo = Request[IO](Method.GET, uri"/todo")
-      response <- Routes.todoRoute(todo)(generator).orNotFound(getTodo)
+      response <- Routes.todoRoute(todo).orNotFound(getTodo)
       status = response.status
     } yield status
     assertIO(statusIO, Status.Ok)
@@ -30,7 +31,7 @@ class TodoSpec extends CatsEffectSuite:
     val bodyIO = for {
       todo <- InMemoryTodo.make[IO]
       getTodo = Request[IO](Method.GET, uri"/todo")
-      response <- Routes.todoRoute(todo)(generator).orNotFound(getTodo)
+      response <- Routes.todoRoute(todo).orNotFound(getTodo)
       responseBody <- response.as[String]
     } yield responseBody
     assertIO(bodyIO, "{\"todos\":[]}")
@@ -42,7 +43,7 @@ class TodoSpec extends CatsEffectSuite:
       _ <- todo.add(TodoItem(uuid"00000000-0000-0000-0000-000000000001", "Learn Scala 3", false))
       _ <- todo.add(TodoItem(uuid"00000000-0000-0000-0000-000000000002", "Learn Scala 3", false))
       getTodo = Request[IO](Method.GET, uri"/todo")
-      response <- Routes.todoRoute(todo)(generator).orNotFound(getTodo)
+      response <- Routes.todoRoute(todo).orNotFound(getTodo)
       responseBody <- response.as[String]
     } yield responseBody
     assertIO(bodyIO, "{\"todos\":[{\"id\":\"00000000-0000-0000-0000-000000000001\",\"description\":\"Learn Scala 3\",\"completed\":false},{\"id\":\"00000000-0000-0000-0000-000000000002\",\"description\":\"Learn Scala 3\",\"completed\":false}]}")
@@ -54,7 +55,7 @@ class TodoSpec extends CatsEffectSuite:
       _ <- todo.add(TodoItem(uuid"00000000-0000-0000-0000-000000000001", "Learn Scala 3", false))
       _ <- todo.add(TodoItem(uuid"00000000-0000-0000-0000-000000000002", "Learn Scala 3", false))
       completeTodo = Request[IO](Method.PATCH, uri"/todo/00000000-0000-0000-0000-000000000001").withEntity(CompleteTodoRequest(completed = true))
-      response <- Routes.todoRoute(todo)(generator).orNotFound(completeTodo)
+      response <- Routes.todoRoute(todo).orNotFound(completeTodo)
       todos <- todo.list
       status = response.status
     } yield (status, todos)
@@ -73,7 +74,7 @@ class TodoSpec extends CatsEffectSuite:
       _ <- todo.add(TodoItem(uuid"00000000-0000-0000-0000-000000000001", "Learn Scala 3", false))
       _ <- todo.add(TodoItem(uuid"00000000-0000-0000-0000-000000000002", "Learn Scala 3", false))
       deleteTodo = Request[IO](Method.DELETE, uri"/todo/00000000-0000-0000-0000-000000000001")
-      response <- Routes.todoRoute(todo)(generator).orNotFound(deleteTodo)
+      response <- Routes.todoRoute(todo).orNotFound(deleteTodo)
       todos <- todo.list
       status = response.status
     } yield (status, todos)
@@ -87,7 +88,7 @@ class TodoSpec extends CatsEffectSuite:
     val statusAndTodos = for {
       todo <- InMemoryTodo.make[IO]
       addTodo = Request[IO](Method.POST, uri"/todo").withEntity(CreateTodoRequest(TodoItem(uuid"00000000-0000-0000-0000-000000000001", "Learn Scala 3", false)))
-      response <- Routes.todoRoute(todo)(generator).orNotFound(addTodo)
+      response <- Routes.todoRoute(todo).orNotFound(addTodo)
       todos <- todo.list
       status = response.status
     } yield (status, todos)
